@@ -1,6 +1,11 @@
 let clicks = 0;
-let timeLeft = 5;
+let counter = 5;
+let timeLeft = counter;
 let timerRunning = false;
+let timer;
+let timerText = document.getElementById("timer")
+let cpsText = document.getElementById("cps")
+let clickBtn = document.getElementById("clickBtn")
 
 document.getElementById("clickBtn").onclick = () => {
 
@@ -14,34 +19,37 @@ document.getElementById("clickBtn").onclick = () => {
     }
 };
 
+function func() {
+        
+    timeLeft--;
+
+    timerText.innerText = "Time Left: " + timeLeft;
+
+    if (timeLeft === 0) {
+        
+        clearInterval(timer);
+
+        let cps = (clicks / counter).toFixed(2);
+        timerText.innerText = "Time up!"
+        cpsText.innerText ="Total Clicks: " + clicks + " | CPS: " + cps;
+
+        clickBtn.disabled = true;
+    }
+
+}
+
+
 function startCountdown() {
-    let timer = setInterval(() => {
-        timeLeft--;
-
-        document.getElementById("timer").innerText = "Time Left: " + timeLeft;
-
-        if (timeLeft === 0) {
-            clearInterval(timer);
-
-            let cps = (clicks / 5).toFixed(2);
-
-            document.getElementById("cps").innerText =
-                "Time up! Total Clicks: " + clicks + " | CPS: " + cps;
-
-            document.getElementById("clickBtn").disabled = true;
-        }
-
-    }, 1000);
+    timer = setInterval(func, 1000);
 }
 
 document.getElementById("restartBtn").onclick = () =>{
     clearInterval(timer);
-
     clicks = 0;
-    timeLeft = 5;
+    timeLeft = counter;
     timerRunning = false;
 
-    timerText.innerText = "Time Left: 5";
+    timerText.innerText = "Time Left: " + counter;
     cpsText.innerText = "CPS: 0";
 
     clickBtn.disabled = false;
