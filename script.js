@@ -1,7 +1,7 @@
 let clicks = 0;
 let timeLeft = 5;
-let timerRunning = false;
 let timer = null;
+let timerRunning = false;
 
 const clickBtn = document.getElementById("clickBtn");
 const restartBtn = document.getElementById("restartBtn");
@@ -20,17 +20,18 @@ clickBtn.onclick = () => {
 };
 
 function startCountdown() {
+    timerText.innerText = "Time Left: " + timeLeft;
+
     timer = setInterval(() => {
         timeLeft--;
         timerText.innerText = "Time Left: " + timeLeft;
 
-        if (timeLeft === 0) {
+        if (timeLeft <= 0) {
             clearInterval(timer);
             timerRunning = false;
 
-            let cps = (clicks / 5).toFixed(2);
-            cpsText.innerText =
-                "Time up! Total Clicks: " + clicks + " | CPS: " + cps;
+            const cps = (clicks / 5).toFixed(2);
+            cpsText.innerText = `Time up! Total Clicks: ${clicks} | CPS: ${cps}`;
 
             clickBtn.disabled = true;
         }
@@ -40,12 +41,14 @@ function startCountdown() {
 restartBtn.onclick = () => {
     clearInterval(timer);
 
+    // RESET STATE
     clicks = 0;
     timeLeft = 5;
     timerRunning = false;
+    timer = null;
 
+    // RESET UI
     timerText.innerText = "Time Left: 5";
     cpsText.innerText = "CPS: 0";
-
     clickBtn.disabled = false;
 };
