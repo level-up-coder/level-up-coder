@@ -33,3 +33,7 @@ function startCountdown() {
 
     }, 1000);
 }
+
+document.getElementById("restartBtn").onclick = () =>{
+    timerRunning = false;
+}
