@@ -1,9 +1,14 @@
 let clicks = 0;
 let timeLeft = 5;
 let timerRunning = false;
+let timer = null;
 
-document.getElementById("clickBtn").onclick = () => {
+const clickBtn = document.getElementById("clickBtn");
+const restartBtn = document.getElementById("restartBtn");
+const timerText = document.getElementById("timer");
+const cpsText = document.getElementById("cps");
 
+clickBtn.onclick = () => {
     if (!timerRunning) {
         timerRunning = true;
         startCountdown();
@@ -15,25 +20,32 @@ document.getElementById("clickBtn").onclick = () => {
 };
 
 function startCountdown() {
-    let timer = setInterval(() => {
+    timer = setInterval(() => {
         timeLeft--;
-
-        document.getElementById("timer").innerText = "Time Left: " + timeLeft;
+        timerText.innerText = "Time Left: " + timeLeft;
 
         if (timeLeft === 0) {
             clearInterval(timer);
+            timerRunning = false;
 
             let cps = (clicks / 5).toFixed(2);
-
-            document.getElementById("cps").innerText =
+            cpsText.innerText =
                 "Time up! Total Clicks: " + clicks + " | CPS: " + cps;
 
-            document.getElementById("clickBtn").disabled = true;
+            clickBtn.disabled = true;
         }
-
     }, 1000);
 }
 
-document.getElementById("restartBtn").onclick = () =>{
+restartBtn.onclick = () => {
+    clearInterval(timer);
+
+    clicks = 0;
+    timeLeft = 5;
     timerRunning = false;
-}
+
+    timerText.innerText = "Time Left: 5";
+    cpsText.innerText = "CPS: 0";
+
+    clickBtn.disabled = false;
+};
