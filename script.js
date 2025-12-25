@@ -40,7 +40,7 @@ function startCountdown() {
 
 restartBtn.onclick = () => {
     clearInterval(timer);
-
+    alert("restart button")
     // RESET STATE
     clicks = 0;
     timeLeft = 5;
