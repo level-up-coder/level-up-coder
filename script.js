@@ -1,54 +1,58 @@
-let clicks = 0;
-let timeLeft = 5;
-let timer = null;
-let timerRunning = false;
+document.addEventListener("DOMContentLoaded", () => {
 
-const clickBtn = document.getElementById("clickBtn");
-const restartBtn = document.getElementById("restartBtn");
-const timerText = document.getElementById("timer");
-const cpsText = document.getElementById("cps");
+    let clicks = 0;
+    let timeLeft = 5;
+    let timer = null;
+    let timerRunning = false;
 
-clickBtn.onclick = () => {
-    if (!timerRunning) {
-        timerRunning = true;
-        startCountdown();
-    }
+    const clickBtn = document.getElementById("clickBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const timerText = document.getElementById("timer");
+    const cpsText = document.getElementById("cps");
 
-    if (timeLeft > 0) {
-        clicks++;
-    }
-};
+    clickBtn.onclick = () => {
+        if (!timerRunning) {
+            timerRunning = true;
+            startCountdown();
+        }
 
-function startCountdown() {
-    timerText.innerText = "Time Left: " + timeLeft;
+        if (timeLeft > 0) {
+            clicks++;
+        }
+    };
 
-    timer = setInterval(() => {
-        timeLeft--;
+    function startCountdown() {
         timerText.innerText = "Time Left: " + timeLeft;
 
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            timerRunning = false;
+        timer = setInterval(() => {
+            timeLeft--;
+            timerText.innerText = "Time Left: " + timeLeft;
 
-            const cps = (clicks / 5).toFixed(2);
-            cpsText.innerText = `Time up! Total Clicks: ${clicks} | CPS: ${cps}`;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                timerRunning = false;
 
-            clickBtn.disabled = true;
-        }
-    }, 1000);
-}
+                const cps = (clicks / 5).toFixed(2);
+                cpsText.innerText = `Time up! Total Clicks: ${clicks} | CPS: ${cps}`;
 
-restartBtn.onclick = () => {
-    clearInterval(timer);
-    alert("restart button")
-    // RESET STATE
-    clicks = 0;
-    timeLeft = 5;
-    timerRunning = false;
-    timer = null;
+                clickBtn.disabled = true;
+            }
+        }, 1000);
+    }
 
-    // RESET UI
-    timerText.innerText = "Time Left: 5";
-    cpsText.innerText = "CPS: 0";
-    clickBtn.disabled = false;
-};
+    restartBtn.onclick = () => {
+        alert("restart button"); // THIS WILL FIRE NOW
+
+        clearInterval(timer);
+
+        clicks = 0;
+        timeLeft = 5;
+        timerRunning = false;
+        timer = null;
+
+        timerText.innerText = "Time Left: 5";
+        cpsText.innerText = "CPS: 0";
+        clickBtn.disabled = false;
+    };
+
+});
