@@ -43,7 +43,12 @@ function startCountdown() {
     timer = setInterval(func, 1000);
 }
 
-document.getElementById("restartBtn").onclick = () =>{
+document.getElementById("restartBtn").onclick = () =>{restart()
+};  
+    
+    
+    
+function restart(){
     clearInterval(timer);
     clicks = 0;
     timeLeft = counter;
@@ -53,5 +58,16 @@ document.getElementById("restartBtn").onclick = () =>{
     cpsText.innerText = "CPS: 0";
 
     clickBtn.disabled = false;
+}
 
+document.getElementById("5sec").onclick = () =>{
+    counter = 5;
+};
+
+document.getElementById("10sec").onclick = () =>{
+    counter = 10;
+};
+
+document.getElementById("15sec").onclick = () =>{
+    counter = 10;
 };
