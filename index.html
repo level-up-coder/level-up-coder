@@ -44,6 +44,12 @@ h2{color:white;
     height: 50;
 }
 
+.time-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 </style>
 </head>
 <body>
@@ -56,9 +62,14 @@ h2{color:white;
     CLICK HERE
 </button>
 
-<button class="fivesec" id="5sec">5 SECOND</button>
-<button class="tensec" id="10sec">10 SECOND</button>
-<button class="fifteensec" id="15sec">15 SECOND</button>
+
+
+<div class="time-buttons">
+    <button class="fivesec" id="sec5">5 SECOND</button>
+    <button class="tensec" id="sec10">10 SECOND</button>
+    <button class="fifteensec" id="sec15">15 SECOND</button>
+</div>
+
 <h2 id="cps">CPS: 5</h2>
 <br>
 <br>
