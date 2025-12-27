@@ -42,12 +42,6 @@ function func() {
 function startCountdown() {
     timer = setInterval(func, 1000);
 }
-
-document.getElementById("restartBtn").onclick = () =>{restart()
-};  
-    
-    
-    
 function restart(){
     clearInterval(timer);
     clicks = 0;
@@ -74,3 +68,20 @@ document.getElementById("15sec").onclick = () =>{
     counter = 10;
     restart();
 };
+document.getElementById("restartBtn").onclick = () =>{restart()
+};  
+    
+    
+    
+function restart(){
+    clearInterval(timer);
+    clicks = 0;
+    timeLeft = counter;
+    timerRunning = false;
+
+    timerText.innerText = "Time Left: " + counter;
+    cpsText.innerText = "CPS: 0";
+
+    clickBtn.disabled = false;
+}
+
