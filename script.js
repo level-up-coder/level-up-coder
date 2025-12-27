@@ -62,12 +62,15 @@ function restart(){
 
 document.getElementById("5sec").onclick = () =>{
     counter = 5;
+    restart();
 };
 
 document.getElementById("10sec").onclick = () =>{
     counter = 10;
+    restart();
 };
 
 document.getElementById("15sec").onclick = () =>{
     counter = 10;
+    restart();
 };
