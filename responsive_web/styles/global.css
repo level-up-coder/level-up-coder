@@ -49,7 +49,9 @@ h3{
     .roundCorners.bottom{
         border-radius: 0 0 15px 15px;
     }
-
+.bg-mauve{
+    background-color: #BC8796;
+}
 .logo{
     font-family: "Merriweather", serif;
     font-weight: bold;
