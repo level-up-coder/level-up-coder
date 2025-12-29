@@ -1,13 +1,13 @@
 body {
     margin: 0;
     padding: 0;
-    font-family:"Open Sans", sans-serif;
+    font-family:"Open Sans",serif;
     font-size: 15px;
     color: #000;
     background-color: white;
 }
 
-.space.v80{
+.spacer.v80{
     height: 80px;
 }
 
