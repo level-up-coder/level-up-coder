@@ -279,15 +279,15 @@ h2{
     background-color:#345995;
     color:#fff;
     border-radius: 30px;
-    -webkit-transition:  250ms ease-out;
-            -ms-transition: 250ms ease-out;
-            transition: 250ms ease-out;
+    -webkit-transition:  all 500ms ease-out;
+    -ms-transition: all 500ms ease-out;
+    transition:all 500ms ease-out;
     cursor: pointer;
 }
 
     #subscribe input[type=submit]:hover{
         background-color: #F46036;
-        -webkit-transition:  250ms ease-out;
-            -ms-transition: 250ms ease-out;
-            transition: 250ms ease-out;
+        -webkit-transition:  all 250ms ease-out;
+        -ms-transition: all 250ms ease-out;
+        transition:all 250ms ease-out;
     }
