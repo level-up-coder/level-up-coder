@@ -218,3 +218,76 @@ h2{
     .middleImage img{
         max-width: 1000px;
     }
+
+#scrollToTop{
+    display: none;
+    opacity: .5;
+    background-color: #F46036;
+    padding: 0 20px;
+    color: #fff;
+    width: 26px;
+    font-size: 40px;
+    line-height: 48px;
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    border: 1px solid white;
+    border-radius: 30px;
+}
+
+    #scrollToTop:hover{
+        opacity: 1;
+        -webkit-transition:  250ms linear;
+        -ms-transition: 250ms linear;
+        transition: 250ms linear;
+        cursor: pointer;
+    }
+
+.contactMap{
+    width: 100%;
+    height: 400px;
+}
+
+#subscribe{
+    background-color: #4392F1;
+    height: 160px;
+    padding-top: 40px;
+}
+
+    #sunscribe h2{
+        margin: 15px 0 20px 0;
+        color: #fff;
+        font-size: 24px;
+        font-family: "Open Sans", sans-serif;
+        font-weight: bold;
+    }
+
+#subscribe input[type=text] {
+    border: 0;
+    width: 250px;
+    height: 28px;
+    font-size: 14px;
+    padding: 0 10px;
+    border-radius: 30px;
+}
+
+#subscribe input[type=submit] {
+    border: 0;
+    width: 80px;
+    height: 30px;
+    font-size: 14px;
+    background-color:#345995;
+    color:#fff;
+    border-radius: 30px;
+    -webkit-transition:  250ms ease-out;
+            -ms-transition: 250ms ease-out;
+            transition: 250ms ease-out;
+    cursor: pointer;
+}
+
+    #subscribe input[type=submit]:hover{
+        background-color: #F46036;
+        -webkit-transition:  250ms ease-out;
+            -ms-transition: 250ms ease-out;
+            transition: 250ms ease-out;
+    }
