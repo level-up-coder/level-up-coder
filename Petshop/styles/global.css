@@ -1,0 +1,51 @@
+body{
+    margin:0;
+    padding:0;
+    font-family: "Open Sans", sans-serif;
+    font-size: 15px;
+    background-color: white;
+    color: #333;
+}
+
+h1,h2{
+    margin:0;
+    padding:0;
+    font-family:"Anton", cursive;
+    font-weight:normal;
+}
+
+h1{
+    font-size: 110px;
+}
+
+h2{
+    font-size: 30px;
+}
+
+.sapcer.v20{
+    height: 20px;
+}
+.sapcer.v40{
+    height: 40px;
+}
+.sapcer.v80{
+    height: 80px;
+}
+
+.clear{
+    clear: both;
+}
+
+#promo,#subscribe,#footer{
+    text-align: center;
+    color:#fff;
+    min-width: 1000px;
+}
+#promo{
+    background-color: #F46036;
+}
+
+#promo>div{
+    padding: 15 px;
+}
+
