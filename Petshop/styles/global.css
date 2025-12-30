@@ -107,3 +107,43 @@ h2{
 .logo{
     font-family: "Anton", cursive;
 }
+
+#banner{
+    background-image: url("../images/banner.jpg");
+    background-repeat: no-repeat;
+    background-position: center top;
+    width: 100%;
+    text-align: center;
+    padding-top: 300px;
+    color: #333;
+}
+
+#banner .logo{
+    margin-top: 20px;
+}
+
+#banner #action{
+        font-weight: bold;
+        width: 200px;
+        margin: 20px auto 0 auto;
+}
+
+        #banner #action a{
+            -webkit-transition:  250ms ease-out;
+            -ms-transition: 250ms ease-out;
+            transition: 250ms ease-out;
+            padding: 20px;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            background-color: #4392F1;
+        }
+
+            #banner #action a:hover{
+                -webkit-transition:  250ms ease-out;
+                -ms-transition: 250ms ease-out;
+                transition: 250ms ease-out;
+                background-color: #F46036;
+                padding: 20px 40px;
+            }
+    
