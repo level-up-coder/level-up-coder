@@ -146,4 +146,51 @@ h2{
                 background-color: #F46036;
                 padding: 20px 40px;
             }
-    
+
+.feature .leftColumn{
+    width: 50%;
+    float: left;
+    text-align: center;
+}
+
+.feature .rightColumn{
+    margin-left: 50%;
+    width: 50%;
+    text-align: center;
+}
+
+.feature .leftColumn .text, .feature .rightColumn .text{
+    padding: 80px 20px 20px 80px;
+    min-height: 260px;
+}
+
+.feature .leftColumn .text a, .feature .rightColumn .text{
+        -webkit-transition:  250ms ease-out;
+        -ms-transition: 250ms ease-out;
+        transition: 250ms ease-out;
+        padding: 20px;
+        background-color: #4392F1;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 30px;
+}
+
+        .feature .leftColumn .text a:hover, .feature .rightColumn .text a:hover{
+            -webkit-transition:  250ms ease-out;
+            -ms-transition: 250ms ease-out;
+            transition: 250ms ease-out;
+            background-color: #F46036;
+            text-decoration: none;
+            padding: 20px 40px;
+        }
+
+.feature hr{
+    background-color: #333;
+    height: 1px;
+    border: 0;
+    width: 50px;
+}
+
+.featureImage img{
+    width: 500px;
+}
