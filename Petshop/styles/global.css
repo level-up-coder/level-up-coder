@@ -164,7 +164,7 @@ h2{
     min-height: 260px;
 }
 
-.feature .leftColumn .text a, .feature .rightColumn .text{
+.feature .leftColumn .text a, .feature .rightColumn .text a{
         -webkit-transition:  250ms ease-out;
         -ms-transition: 250ms ease-out;
         transition: 250ms ease-out;
@@ -194,3 +194,27 @@ h2{
 .featureImage img{
     width: 500px;
 }
+
+.feature .leftColumn .text a.emailLink, .feature .rightColumn .text a.emailLink{
+    color: #fff;
+    text-decoration: none;
+    transition: none;
+    padding: 10px;
+    border: 0;
+    background-color: #4392F1;
+}
+
+            .feature .leftColumn .text a.emailLink:hover, .feature .rightColumn .text a.emailLink:hover{
+            -webkit-transition:  250ms ease-out;
+            -ms-transition: 250ms ease-out;
+            transition: 250ms ease-out;
+            background-color: #F46036;
+            }
+
+.middleImage{
+    text-align: center;
+}
+
+    .middleImage img{
+        max-width: 1000px;
+    }
