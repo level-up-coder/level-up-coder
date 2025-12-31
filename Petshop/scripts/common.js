@@ -12,7 +12,7 @@ function Common(){
         let promoItems=$("#promo>div");
         this.promoBar.promoItems=promoItems;
         this.promoBar.numberOfItems=promoItems.length;
-        this.startdelay();
+        this.startDelay();
     }
         this.startDelay()=function(){
             setTimeout(function(){
