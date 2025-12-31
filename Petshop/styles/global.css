@@ -291,3 +291,20 @@ h2{
         -ms-transition: all 250ms ease-out;
         transition:all 250ms ease-out;
     }
+
+#footer{
+    background-color: #F46036;
+    height: 80px;
+}
+
+#footer ul{
+    list-style-type: none;
+    margin: 28px 0 0 0;
+    padding: 0;
+    overflow: hidden;
+    display: inline-block;
+}
+
+    #footer li{
+        float: left;
+    }
