@@ -205,10 +205,10 @@ h2{
 }
 
             .feature .leftColumn .text a.emailLink:hover, .feature .rightColumn .text a.emailLink:hover{
-            -webkit-transition:  250ms ease-out;
-            -ms-transition: 250ms ease-out;
-            transition: 250ms ease-out;
-            background-color: #F46036;
+                -webkit-transition:  250ms ease-out;
+                -ms-transition: 250ms ease-out;
+                transition: 250ms ease-out;
+                background-color: #F46036;
             }
 
 .middleImage{
@@ -237,9 +237,9 @@ h2{
 
     #scrollToTop:hover{
         opacity: 1;
-        -webkit-transition:  250ms linear;
-        -ms-transition: 250ms linear;
-        transition: 250ms linear;
+        -webkit-transition: all 250ms linear;
+        -ms-transition: all 250ms linear;
+        transition: all 250ms linear;
         cursor: pointer;
     }
 
