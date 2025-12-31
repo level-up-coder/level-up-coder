@@ -165,9 +165,9 @@ h2{
 }
 
 .feature .leftColumn .text a, .feature .rightColumn .text a{
-        -webkit-transition:  250ms ease-out;
-        -ms-transition: 250ms ease-out;
-        transition: 250ms ease-out;
+        -webkit-transition: all 250ms ease-out;
+        -ms-transition: all 250ms ease-out;
+        transition: all 250ms ease-out;
         padding: 20px;
         background-color: #4392F1;
         color: #fff;
@@ -176,9 +176,9 @@ h2{
 }
 
         .feature .leftColumn .text a:hover, .feature .rightColumn .text a:hover{
-            -webkit-transition:  250ms ease-out;
-            -ms-transition: 250ms ease-out;
-            transition: 250ms ease-out;
+            -webkit-transition: all 250ms ease-out;
+            -ms-transition:all 250ms ease-out;
+            transition: all 250ms ease-out;
             background-color: #F46036;
             text-decoration: none;
             padding: 20px 40px;
@@ -205,9 +205,9 @@ h2{
 }
 
             .feature .leftColumn .text a.emailLink:hover, .feature .rightColumn .text a.emailLink:hover{
-                -webkit-transition:  250ms ease-out;
-                -ms-transition: 250ms ease-out;
-                transition: 250ms ease-out;
+                -webkit-transition: all 250ms ease-out;
+                -ms-transition:all 250ms ease-out;
+                transition: all 250ms ease-out;
                 background-color: #F46036;
             }
 
