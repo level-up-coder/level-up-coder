@@ -14,7 +14,7 @@ function Common(){
         this.promoBar.numberOfItems=promoItems.length;
         this.startdelay();
     }
-        this.startDelay=function(){
+        this.startDelay()=function(){
             setTimeout(function(){
                 self.showNextPromoItem()
             },4000);
@@ -27,7 +27,7 @@ function Common(){
             } else{
                 self.promoBar.currentItem++;
             }
-            $(self.promoBar.promoItems).eq(self.promoBar.currentItem).fadIn("slow", function(){
+            $(self.promoBar.promoItems).eq(self.promoBar.currentItem).fadeIn("slow", function(){
                 self.startDelay();
             });
         

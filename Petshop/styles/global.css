@@ -46,7 +46,7 @@ h2{
 }
 
 #promo>div{
-    padding: 15 px;
+    padding: 15px;
 }
 
 .wrap{
@@ -84,7 +84,7 @@ h2{
         -ms-transition: all 250ms ease-out;
         transition: all 250ms ease-out;
 }
-        #toplinks li a:hover{
+        #topLinks li a:hover{
             color:#4392F1;
             -webkit-transition: all 250ms ease-out;
             -ms-transition:all 250ms ease-out;
