@@ -308,3 +308,35 @@ h2{
     #footer li{
         float: left;
     }
+
+#footer li a{
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+        text-decoration: none;
+        font-size: 18px;
+        -webkit-transition: all 250ms linear;
+        -ms-transition:all 250ms linear;
+        transition: all 250ms linear;
+}
+
+        #footer li a:hover{
+            color: #333;
+            -webkit-transition:  all 250ms linear;
+            -ms-transition: all 250ms linear;
+            transition:all 250ms linear;
+        }
+
+#copyright{
+    text-align: center;
+    background-color: #345995;
+    color: #fff;
+    height: 40px;
+    padding-top: 18px;
+    font-size: 16px;
+}
+
+    #copyright .logo{
+        font-family: "Open Sans", sans-serif;
+        font-weight: bold;
+    }
