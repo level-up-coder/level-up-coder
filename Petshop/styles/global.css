@@ -211,6 +211,16 @@ h2{
                 background-color: #F46036;
             }
 
+
+.telnum{
+    font-family: "Anton", cursive;
+}
+
+        .telnum:hover{
+
+        background-color:#4392F1;
+
+}
 .middleImage{
     text-align: center;
 }
