@@ -214,6 +214,7 @@ h2{
 
 .telnum{
     font-family: "Anton", cursive;
+    text-decoration: none;
 }
 
         .telnum:hover{
