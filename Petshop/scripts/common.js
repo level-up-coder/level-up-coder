@@ -14,7 +14,7 @@ function Common(){
         this.promoBar.numberOfItems=promoItems.length;
         this.startDelay();
     }
-        this.startDelay()=function(){
+        this.startDelay=function(){
             setTimeout(function(){
                 self.showNextPromoItem()
             },4000);
