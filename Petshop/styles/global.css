@@ -216,6 +216,7 @@ h2{
     font-family: "Anton", cursive;
     text-decoration: none;
     transition:none;
+    color: #333;
 }
 
         .telnum:hover{
