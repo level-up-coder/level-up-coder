@@ -215,11 +215,12 @@ h2{
 .telnum{
     font-family: "Anton", cursive;
     text-decoration: none;
+    transition:none;
 }
 
         .telnum:hover{
 
-        background-color:#4392F1;
+        color:#4392F1;
 
 }
 .middleImage{
