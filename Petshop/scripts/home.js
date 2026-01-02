@@ -20,3 +20,6 @@ $(document).ready(function(){
     app.homeIndex.initialiseScrollToTopButton();
 });
 
+document.getElementById("contact") = () =>{
+    $("html, body").animate({scrollTop: $("#tel").offset().top},1000);
+};
