@@ -164,7 +164,7 @@ h2{
     min-height: 260px;
 }
 
-.feature .leftColumn .text a, .feature .rightColumn .text a{
+.feature .leftColumn .text a:not(.telnum), .feature .rightColumn .text a:not(.telnum){
         -webkit-transition: all 250ms ease-out;
         -ms-transition: all 250ms ease-out;
         transition: all 250ms ease-out;
@@ -175,7 +175,7 @@ h2{
         border-radius: 30px;
 }
 
-        .feature .leftColumn .text a:hover, .feature .rightColumn .text a:hover{
+        .feature .leftColumn .text a:hover:not(.telnum), .feature .rightColumn .text a:hover:not(.telnum){
             -webkit-transition: all 250ms ease-out;
             -ms-transition:all 250ms ease-out;
             transition: all 250ms ease-out;
