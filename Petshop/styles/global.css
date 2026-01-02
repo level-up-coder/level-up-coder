@@ -216,7 +216,7 @@ h2{
 .phone-text { display: inline; }
 
 /* Mobile view (Screens smaller than 768px): Show link, hide plain text */
-@media (max-width: 768px) {
+@media (max-width: 1500px) {
     .phone-link { display: inline !important; }
     .phone-text { display: none !important; }
 }
