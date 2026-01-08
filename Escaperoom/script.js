@@ -1,6 +1,6 @@
 let device;
 let uartCharacteristic;
-let seconds = 20; // 5 minutes
+let seconds = 20; // 20 sec
 let interval;
 
 // Nordic UART Service UUIDs
