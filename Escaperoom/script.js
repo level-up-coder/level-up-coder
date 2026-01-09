@@ -1,74 +1,60 @@
-let device = null;
-let uartCharacteristic = null;
-let seconds = 20;
-let timerInterval = null;
+let device;
+let server;
+let uartService;
+let uartRX;
+let uartTX;
+
+// micro:bit UART UUIDs (CORRECT)
+const UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+const UART_TX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"; // micro:bit → browser
+const UART_RX_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"; // browser → micro:bit
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("connect").addEventListener("click", connect);
-  document.getElementById("startBtn").addEventListener("click", startTimer);
-});
 
-// ---------------- CONNECT ----------------
-async function connect() {
-  try {
-    console.log("Connect clicked");
+  const connectBtn = document.getElementById("connect");
+  const startBtn = document.getElementById("start");
 
-    device = await navigator.bluetooth.requestDevice({
-      filters: [{ namePrefix: "BBC micro:bit" }],
-      optionalServices: [
-        "6e400001-b5a3-f393-e0a9-e50e24dcca9e" // UART
-      ]
-    });
+  // ---------- CONNECT ----------
+  connectBtn.addEventListener("click", async () => {
+    try {
+      console.log("Connect clicked");
 
-    const server = await device.gatt.connect();
-    const service = await server.getPrimaryService(
-      "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
-    );
+      device = await navigator.bluetooth.requestDevice({
+        filters: [{ services: [UART_SERVICE_UUID] }]
+      });
 
-    uartCharacteristic = await service.getCharacteristic(
-      "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
-    );
+      server = await device.gatt.connect();
+      uartService = await server.getPrimaryService(UART_SERVICE_UUID);
 
-    alert("micro:bit connected ✅");
-  } catch (err) {
-    console.error(err);
-    alert("Bluetooth popup blocked ❌");
-  }
-}
+      uartTX = await uartService.getCharacteristic(UART_TX_UUID);
+      uartRX = await uartService.getCharacteristic(UART_RX_UUID);
 
-// ---------------- TIMER ----------------
-function startTimer() {
-  if (timerInterval) return;
-
-  updateDisplay();
-
-  timerInterval = setInterval(() => {
-    seconds--;
-    updateDisplay();
-
-    if (seconds <= 0) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      sendBoom();
+      alert("micro:bit connected ✅");
+    } catch (err) {
+      console.error(err);
+      alert("Bluetooth connection failed");
     }
-  }, 1000);
-}
+  });
 
-// ---------------- DISPLAY ----------------
-function updateDisplay() {
-  const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-  const s = String(seconds % 60).padStart(2, "0");
-  document.getElementById("timer").innerText = `${m}:${s}`;
-}
+  // ---------- START ----------
+  startBtn.addEventListener("click", async () => {
+    if (!uartRX) {
+      alert("Connect micro:bit first!");
+      return;
+    }
 
-// ---------------- SEND BOOM ----------------
-function sendBoom() {
-  if (!uartCharacteristic) {
-    alert("micro:bit not connected");
-    return;
-  }
+    try {
+      console.log("Start clicked");
 
-  const encoder = new TextEncoder();
-  uartCharacteristic.writeValue(encoder.encode("BOOM\n"));
-  alert("💥 BOOM sent");
-}
+      // Send BOOM\n to micro:bit
+      const encoder = new TextEncoder();
+      await uartRX.writeValue(encoder.encode("BOOM\n"));
+
+      alert("💥 BOOM sent to micro:bit!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send command");
+    }
+  });
+
+});
