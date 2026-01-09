@@ -1,15 +1,22 @@
 let device = null;
 let uartCharacteristic = null;
-let seconds = 20;          // ⏱ CHANGE TIMER HERE (in seconds)
+let seconds = 20;
 let timerInterval = null;
 
-// ---------------- CONNECT TO MICRO:BIT ----------------
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("connect").addEventListener("click", connect);
+  document.getElementById("start").addEventListener("click", startTimer);
+});
+
+// ---------------- CONNECT ----------------
 async function connect() {
   try {
+    console.log("Connect clicked");
+
     device = await navigator.bluetooth.requestDevice({
       filters: [{ namePrefix: "BBC micro:bit" }],
       optionalServices: [
-        "6e400001-b5a3-f393-e0a9-e50e24dcca9e" // UART service
+        "6e400001-b5a3-f393-e0a9-e50e24dcca9e" // UART
       ]
     });
 
@@ -19,19 +26,19 @@ async function connect() {
     );
 
     uartCharacteristic = await service.getCharacteristic(
-      "6e400003-b5a3-f393-e0a9-e50e24dcca9e" // UART TX
+      "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
     );
 
-    alert("micro:bit connected");
+    alert("micro:bit connected ✅");
   } catch (err) {
-    alert("Bluetooth connection failed");
     console.error(err);
+    alert("Bluetooth popup blocked ❌");
   }
 }
 
-// ---------------- START TIMER ----------------
+// ---------------- TIMER ----------------
 function startTimer() {
-  if (timerInterval) return; // prevent double start
+  if (timerInterval) return;
 
   updateDisplay();
 
@@ -63,9 +70,5 @@ function sendBoom() {
 
   const encoder = new TextEncoder();
   uartCharacteristic.writeValue(encoder.encode("BOOM\n"));
-  alert("💥 BOOM sent!");
+  alert("💥 BOOM sent");
 }
-
-// ---------------- BUTTON HOOKS ----------------
-document.getElementById("connect").addEventListener("click", connect);
-document.getElementById("start").addEventListener("click", startTimer);
