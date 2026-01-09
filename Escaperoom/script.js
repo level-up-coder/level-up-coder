@@ -5,7 +5,7 @@ let timerInterval = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("connect").addEventListener("click", connect);
-  document.getElementById("start").addEventListener("click", startTimer);
+  document.getElementById("startBtn").addEventListener("click", startTimer);
 });
 
 // ---------------- CONNECT ----------------
