@@ -1,56 +1,71 @@
-let device;
-let uartCharacteristic;
-let seconds = 20; // 20 sec
-let interval;
+let device = null;
+let uartCharacteristic = null;
+let seconds = 20;          // ⏱ CHANGE TIMER HERE (in seconds)
+let timerInterval = null;
 
-// Nordic UART Service UUIDs
-const UART_SERVICE = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-const UART_TX = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
-
-document.getElementById("connectBtn").onclick = connect;
-document.getElementById("startBtn").onclick = startTimer;
-
+// ---------------- CONNECT TO MICRO:BIT ----------------
 async function connect() {
-  device = await navigator.bluetooth.requestDevice({
-    filters: [{ namePrefix: "BBC micro:bit" }],
-    optionalServices: [UART_SERVICE]
-  });
+  try {
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ namePrefix: "BBC micro:bit" }],
+      optionalServices: [
+        "6e400001-b5a3-f393-e0a9-e50e24dcca9e" // UART service
+      ]
+    });
 
-  const server = await device.gatt.connect();
-  const service = await server.getPrimaryService(UART_SERVICE);
-  uartCharacteristic = await service.getCharacteristic(UART_TX);
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(
+      "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
+    );
 
-  alert("micro:bit connected");
+    uartCharacteristic = await service.getCharacteristic(
+      "6e400003-b5a3-f393-e0a9-e50e24dcca9e" // UART TX
+    );
+
+    alert("micro:bit connected");
+  } catch (err) {
+    alert("Bluetooth connection failed");
+    console.error(err);
+  }
 }
 
+// ---------------- START TIMER ----------------
 function startTimer() {
-  if (!uartCharacteristic) {
-    alert("Connect to micro:bit first!");
-    return;
-  }
+  if (timerInterval) return; // prevent double start
 
-  interval = setInterval(() => {
+  updateDisplay();
+
+  timerInterval = setInterval(() => {
     seconds--;
-    updateTimer();
+    updateDisplay();
 
     if (seconds <= 0) {
-      clearInterval(interval);
-      explode();
+      clearInterval(timerInterval);
+      timerInterval = null;
+      sendBoom();
     }
   }, 1000);
 }
 
-function updateTimer() {
+// ---------------- DISPLAY ----------------
+function updateDisplay() {
   const m = String(Math.floor(seconds / 60)).padStart(2, "0");
   const s = String(seconds % 60).padStart(2, "0");
   document.getElementById("timer").innerText = `${m}:${s}`;
 }
 
-async function explode() {
-  document.body.style.backgroundColor = "darkred";
-  document.getElementById("timer").innerText = "00:00";
+// ---------------- SEND BOOM ----------------
+function sendBoom() {
+  if (!uartCharacteristic) {
+    alert("micro:bit not connected");
+    return;
+  }
 
-  await uartCharacteristic.writeValue(
-    new TextEncoder().encode("BOOM\n")
-  );
+  const encoder = new TextEncoder();
+  uartCharacteristic.writeValue(encoder.encode("BOOM\n"));
+  alert("💥 BOOM sent!");
 }
+
+// ---------------- BUTTON HOOKS ----------------
+document.getElementById("connect").addEventListener("click", connect);
+document.getElementById("start").addEventListener("click", startTimer);
