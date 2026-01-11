@@ -10,9 +10,9 @@
         .container { width: 90%; max-width: 800px; background: var(--panel-bg); padding: 20px; border-radius: 10px; box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); border: 1px solid #333; }
         h1 { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .timer-box { font-size: 3rem; color: var(--danger); text-align: center; margin: 20px 0; border: 2px solid var(--danger); padding: 10px; background: rgba(255, 62, 62, 0.1); display: none; }
-        button { background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 10px 20px; font-family: inherit; cursor: pointer; transition: all 0.3s; margin: 5px; }
+        button { background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 10px 20px; font-family: inherit; cursor: pointer; transition: all 0.3s; margin: 5px; text-transform: uppercase; }
         button:hover { background: var(--neon-green); color: black; box-shadow: 0 0 15px var(--neon-green); }
-        #console { background: #000; height: 250px; overflow-y: auto; border: 1px solid #333; padding: 15px; margin-top: 20px; font-size: 0.85rem; }
+        #console { background: #000; height: 250px; overflow-y: auto; border: 1px solid #333; padding: 15px; margin-top: 20px; font-size: 0.85rem; color: #fff; }
         .log-entry { margin-bottom: 5px; }
     </style>
 </head>
@@ -24,11 +24,14 @@
     
     <div id="timerDisplay" class="timer-box">T-MINUS: 20s</div>
 
-    <button id="connectBtn">INITIALIZE LINK</button>
-    <button id="startTimerBtn" style="display:none; border-color:var(--danger); color:var(--danger)">ARM PAYLOAD</button>
+    <div id="controls">
+        <button id="connectBtn">INITIALIZE LINK</button>
+        <button id="startTimerBtn" style="display:none; border-color:var(--danger); color:var(--danger)">ARM PAYLOAD</button>
+        <button id="defuseBtn" style="display:none; border-color:var(--neon-green); color:var(--neon-green)">DEFUSE</button>
+    </div>
 
     <div id="console">
-        <div class="log-entry">Waiting for hardware connection...</div>
+        <div class="log-entry">> System kernel loaded. Waiting for hardware...</div>
     </div>
 </div>
 
@@ -66,6 +69,8 @@
 
     document.getElementById('startTimerBtn').onclick = () => {
         document.getElementById('timerDisplay').style.display = "block";
+        document.getElementById('defuseBtn').style.display = "inline-block";
+        document.getElementById('startTimerBtn').style.display = "none";
         log("PAYLOAD ARMED. 20 SECOND COUNTDOWN INITIATED.", "var(--danger)");
         
         timerInterval = setInterval(async () => {
@@ -76,11 +81,20 @@
                 clearInterval(timerInterval);
                 log("TIME EXPIRED. SENDING DETONATION SIGNAL...", "var(--danger)");
                 const encoder = new TextEncoder();
-                // We send the keyword "BOOM" to the micro:bit
+                // Send "BOOM" keyword + newline for the micro:bit to read
                 await rxChar.writeValue(encoder.encode("BOOM\n"));
-                document.getElementById('timerDisplay').innerText = "PAYLOAD DELIVERED";
+                document.getElementById('timerDisplay').innerText = "DETONATED";
+                document.getElementById('defuseBtn').style.display = "none";
             }
         }, 1000);
+    };
+
+    document.getElementById('defuseBtn').onclick = () => {
+        clearInterval(timerInterval);
+        document.getElementById('timerDisplay').innerText = "DEFUSED";
+        document.getElementById('timerDisplay').style.color = "var(--neon-green)";
+        log("DEFUSE SUCCESSFUL. SYSTEM SECURE.", "var(--neon-green)");
+        document.getElementById('defuseBtn').style.display = "none";
     };
 </script>
 </body>
