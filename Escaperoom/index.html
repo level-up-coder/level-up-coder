@@ -10,43 +10,43 @@
     <p>Received Data: <b id="data">None</b></p>
 
     <script>
-        // Standard micro:bit UART Service UUIDs
-const UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-const UART_TX_CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"; // From micro:bit to Web
-const UART_RX_CHARACTERISTIC_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"; // From Web to micro:bit
+const UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+const UART_RX    = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'; // Web to micro:bit
+const UART_TX    = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'; // micro:bit to Web
 
-async function connect() {
+async function onConnectButtonClick() {
     try {
-        console.log('Requesting micro:bit...');
+        console.log('Requesting Bluetooth Device...');
         const device = await navigator.bluetooth.requestDevice({
+            // We use namePrefix to find only micro:bits
             filters: [{ namePrefix: 'BBC micro:bit' }],
-            optionalServices: [UART_SERVICE_UUID]
+            // We MUST list the service here for the browser to allow access later
+            optionalServices: [UART_SERVICE]
         });
 
         console.log('Connecting to GATT Server...');
         const server = await device.gatt.connect();
 
-        console.log('Getting UART Service...');
-        const service = await server.getPrimaryService(UART_SERVICE_UUID);
+        console.log('Getting Service...');
+        const service = await server.getPrimaryService(UART_SERVICE);
 
-        console.log('Getting Characteristics...');
-        // We look for the TX characteristic to listen for data
-        const txChar = await service.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
-        
-        await txChar.startNotifications();
-        txChar.addEventListener('characteristicvaluechanged', (event) => {
+        console.log('Getting Characteristic...');
+        const characteristic = await service.getCharacteristic(UART_TX);
+
+        // Start receiving data
+        await characteristic.startNotifications();
+        characteristic.addEventListener('characteristicvaluechanged', (event) => {
             let value = new TextDecoder().decode(event.target.value);
             document.getElementById('data').innerText = value;
+            console.log('Received:', value);
         });
 
-        document.getElementById('status').innerText = "Connected!";
+        document.getElementById('status').innerText = "Connected to " + device.name;
     } catch (error) {
-        console.error("Error details:", error);
-        alert("Connection failed: " + error.message);
+        console.error('Connection failed!', error);
+        alert('Error: ' + error.message);
     }
 }
-
-document.getElementById('connect').addEventListener('click', connect);
     </script>
 </body>
 </html>
