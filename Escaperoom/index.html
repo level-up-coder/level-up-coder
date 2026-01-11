@@ -10,35 +10,43 @@
     <p>Received Data: <b id="data">None</b></p>
 
     <script>
-        let uartServiceId = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-        let uartRXCharacteristicId = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+        // Standard micro:bit UART Service UUIDs
+const UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+const UART_TX_CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"; // From micro:bit to Web
+const UART_RX_CHARACTERISTIC_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"; // From Web to micro:bit
 
-        document.getElementById('connect').addEventListener('click', async () => {
-            try {
-                const device = await navigator.bluetooth.requestDevice({
-                    filters: [{ namePrefix: 'BBC micro:bit' }],
-                    optionalServices: [uartServiceId]
-                });
-
-                document.getElementById('status').innerText = "Connecting...";
-                const server = await device.gatt.connect();
-                const service = await server.getPrimaryService(uartServiceId);
-                const rxCharacteristic = await service.getCharacteristic(uartRXCharacteristicId);
-
-                document.getElementById('status').innerText = "Connected!";
-
-                // Listen for data from micro:bit
-                rxCharacteristic.startNotifications();
-                rxCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
-                    let value = new TextDecoder().decode(event.target.value);
-                    document.getElementById('data').innerText = value;
-                });
-
-            } catch (error) {
-                console.log(error);
-                alert("Connection failed: " + error);
-            }
+async function connect() {
+    try {
+        console.log('Requesting micro:bit...');
+        const device = await navigator.bluetooth.requestDevice({
+            filters: [{ namePrefix: 'BBC micro:bit' }],
+            optionalServices: [UART_SERVICE_UUID]
         });
+
+        console.log('Connecting to GATT Server...');
+        const server = await device.gatt.connect();
+
+        console.log('Getting UART Service...');
+        const service = await server.getPrimaryService(UART_SERVICE_UUID);
+
+        console.log('Getting Characteristics...');
+        // We look for the TX characteristic to listen for data
+        const txChar = await service.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+        
+        await txChar.startNotifications();
+        txChar.addEventListener('characteristicvaluechanged', (event) => {
+            let value = new TextDecoder().decode(event.target.value);
+            document.getElementById('data').innerText = value;
+        });
+
+        document.getElementById('status').innerText = "Connected!";
+    } catch (error) {
+        console.error("Error details:", error);
+        alert("Connection failed: " + error.message);
+    }
+}
+
+document.getElementById('connect').addEventListener('click', connect);
     </script>
 </body>
 </html>
