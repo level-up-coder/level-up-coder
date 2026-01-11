@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micro:bit OS | Terminal</title>
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --bg-dark: #0d0d0d;
+            --panel-bg: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-dark);
+            color: var(--neon-green);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            border: 1px solid #333;
+        }
+
+        h1 { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+
+        .status-bar { margin-bottom: 20px; font-size: 0.9rem; color: #888; }
+        #status-text { color: #ff3e3e; font-weight: bold; }
+
+        button {
+            background: transparent;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            padding: 10px 20px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: var(--neon-green);
+            color: black;
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        input {
+            flex-grow: 1;
+            background: #000;
+            border: 1px solid #333;
+            color: var(--neon-green);
+            padding: 10px;
+            outline: none;
+        }
+
+        #console {
+            background: #000;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .log-entry { margin-bottom: 5px; }
+        .log-time { color: #555; margin-right: 10px; }
+        .log-data { color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Micro:bit Link System v2.0</h1>
+    <div class="status-bar">SYSTEM_STATUS: <span id="status-text">DISCONNECTED</span></div>
+
+    <button id="connectBtn">INITIALIZE BLUETOOTH</button>
+
+    <div class="input-group">
+        <input type="text" id="cmdInput" placeholder="Enter command to send to micro:bit...">
+        <button id="sendBtn">SEND_CMD</button>
+    </div>
+
+    <div id="console">
+        <div class="log-entry"><span class="log-time">[00:00:00]</span> Initializing kernel...</div>
+        <div class="log-entry"><span class="log-time">[00:00:00]</span> Waiting for hardware connection...</div>
+    </div>
+</div>
+
+<script>
+    // UUIDs for micro:bit UART Service
+    const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+    const TX_CHARACTERISTIC = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'; // micro:bit transmits to us
+    const RX_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'; // we transmit to micro:bit
+
+    let device, server, service;
+    let rxChar, txChar;
+
+    const connectBtn = document.getElementById('connectBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const cmdInput = document.getElementById('cmdInput');
+    const consoleDiv = document.getElementById('console');
+    const statusText = document.getElementById('status-text');
+
+    function log(msg, type = 'info') {
+        const time = new Date().toLocaleTimeString();
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        let color = type === 'rx' ? '#00ff41' : (type === 'tx' ? '#00bfff' : '#888');
+        entry.innerHTML = `<span class="log-time">[${time}]</span> <span style="color: ${color}">${msg}</span>`;
+        consoleDiv.appendChild(entry);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    }
+
+    connectBtn.onclick = async () => {
+        try {
+            log("Searching for micro:bit...");
+            device = await navigator.bluetooth.requestDevice({
+                filters: [{ namePrefix: 'BBC micro:bit' }],
+                optionalServices: [SERVICE_UUID]
+            });
+
+            log(`Device Found: ${device.name}. Connecting...`);
+            server = await device.gatt.connect();
+            service = await server.getPrimaryService(SERVICE_UUID);
+
+            // Get both channels
+            txChar = await service.getCharacteristic(TX_CHARACTERISTIC);
+            rxChar = await service.getCharacteristic(RX_CHARACTERISTIC);
+
+            // Start listening for data FROM micro:bit
+            await txChar.startNotifications();
+            txChar.addEventListener('characteristicvaluechanged', (event) => {
+                let val = new TextDecoder().decode(event.target.value);
+                log(`INCOMING: ${val}`, 'rx');
+            });
+
+            statusText.innerText = "ONLINE";
+            statusText.style.color = "#00ff41";
+            connectBtn.innerText = "DISCONNECT";
+            log("Handshake complete. Secure link established.");
+
+        } catch (e) {
+            log(`CRITICAL_ERROR: ${e.message}`);
+        }
+    };
+
+    sendBtn.onclick = async () => {
+        const text = cmdInput.value;
+        if (!rxChar || !text) return;
+
+        try {
+            // micro:bit UART expects a newline to trigger "on data received"
+            const encoder = new TextEncoder();
+            await rxChar.writeValue(encoder.encode(text + "\n"));
+            log(`OUTGOING: ${text}`, 'tx');
+            cmdInput.value = "";
+        } catch (e) {
+            log(`SEND_ERROR: ${e.message}`);
+        }
+    };
+
+    // Allow pressing "Enter" to send
+    cmdInput.onkeypress = (e) => { if (e.key === 'Enter') sendBtn.click(); };
+</script>
+
+</body>
+</html>
