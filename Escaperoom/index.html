@@ -1,52 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>micro:bit Web Bluetooth</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>micro:bit V2 Connect</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f4f4f9; }
+        #console { background: #333; color: #0f0; padding: 20px; border-radius: 8px; height: 200px; overflow-y: scroll; margin-top: 20px; text-align: left; }
+        button { padding: 15px 30px; font-size: 1.2rem; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+        button:hover { background: #0056b3; }
+    </style>
 </head>
 <body>
-    <h1>Micro:bit Web Controller</h1>
-    <button id="connect">Connect to micro:bit</button>
-    <p>Status: <span id="status">Disconnected</span></p>
-    <p>Received Data: <b id="data">None</b></p>
+
+    <h1>micro:bit Bluetooth Terminal</h1>
+    <button id="connectBtn">CONNECT MICRO:BIT</button>
+    
+    <div id="console">
+        <p>> System ready. Click Connect to start...</p>
+    </div>
 
     <script>
-const UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-const UART_RX    = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'; // Web to micro:bit
-const UART_TX    = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'; // micro:bit to Web
+        const connectBtn = document.getElementById('connectBtn');
+        const consoleLog = document.getElementById('console');
 
-async function onConnectButtonClick() {
-    try {
-        console.log('Requesting Bluetooth Device...');
-        const device = await navigator.bluetooth.requestDevice({
-            // We use namePrefix to find only micro:bits
-            filters: [{ namePrefix: 'BBC micro:bit' }],
-            // We MUST list the service here for the browser to allow access later
-            optionalServices: [UART_SERVICE]
+        // These are the official micro:bit UART UUIDs
+        const UART_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+        const UART_TX_CHARACTERISTIC_UUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+
+        function log(message) {
+            const p = document.createElement('p');
+            p.innerText = `> ${message}`;
+            consoleLog.appendChild(p);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+
+        connectBtn.addEventListener('click', async () => {
+            try {
+                log("Requesting Bluetooth Device...");
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix: 'BBC micro:bit' }],
+                    optionalServices: [UART_SERVICE_UUID]
+                });
+
+                log(`Connecting to ${device.name}...`);
+                const server = await device.gatt.connect();
+
+                log("Getting UART Service...");
+                const service = await server.getPrimaryService(UART_SERVICE_UUID);
+
+                log("Getting TX Characteristic...");
+                const characteristic = await service.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+
+                log("Starting Notifications...");
+                await characteristic.startNotifications();
+
+                characteristic.addEventListener('characteristicvaluechanged', (event) => {
+                    let value = new TextDecoder().decode(event.target.value);
+                    log(`Data Received: ${value}`);
+                });
+
+                log("SUCCESS: Connected!");
+                connectBtn.innerText = "CONNECTED ✅";
+                connectBtn.style.background = "#28a745";
+
+            } catch (error) {
+                log(`ERROR: ${error}`);
+                console.error(error);
+            }
         });
-
-        console.log('Connecting to GATT Server...');
-        const server = await device.gatt.connect();
-
-        console.log('Getting Service...');
-        const service = await server.getPrimaryService(UART_SERVICE);
-
-        console.log('Getting Characteristic...');
-        const characteristic = await service.getCharacteristic(UART_TX);
-
-        // Start receiving data
-        await characteristic.startNotifications();
-        characteristic.addEventListener('characteristicvaluechanged', (event) => {
-            let value = new TextDecoder().decode(event.target.value);
-            document.getElementById('data').innerText = value;
-            console.log('Received:', value);
-        });
-
-        document.getElementById('status').innerText = "Connected to " + device.name;
-    } catch (error) {
-        console.error('Connection failed!', error);
-        alert('Error: ' + error.message);
-    }
-}
     </script>
 </body>
 </html>
