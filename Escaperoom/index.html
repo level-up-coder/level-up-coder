@@ -1,21 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Escape Room Bomb</title>
-  <link rel="stylesheet" href="style.css" />
+    <title>micro:bit Web Bluetooth</title>
 </head>
 <body>
+    <h1>Micro:bit Web Controller</h1>
+    <button id="connect">Connect to micro:bit</button>
+    <p>Status: <span id="status">Disconnected</span></p>
+    <p>Received Data: <b id="data">None</b></p>
 
-  <h1>💣 BOMB ARMED</h1>
+    <script>
+        let uartServiceId = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+        let uartRXCharacteristicId = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
 
-  <div id="timer">00:20</div>
+        document.getElementById('connect').addEventListener('click', async () => {
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix: 'BBC micro:bit' }],
+                    optionalServices: [uartServiceId]
+                });
 
-  <div class="buttons">
-    <button id="connect">CONNECT</button>
-    <button id="start">START</button>
-  </div>
+                document.getElementById('status').innerText = "Connecting...";
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService(uartServiceId);
+                const rxCharacteristic = await service.getCharacteristic(uartRXCharacteristicId);
 
-  <script src="script.js"></script>
+                document.getElementById('status').innerText = "Connected!";
+
+                // Listen for data from micro:bit
+                rxCharacteristic.startNotifications();
+                rxCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+                    let value = new TextDecoder().decode(event.target.value);
+                    document.getElementById('data').innerText = value;
+                });
+
+            } catch (error) {
+                console.log(error);
+                alert("Connection failed: " + error);
+            }
+        });
+    </script>
 </body>
 </html>
