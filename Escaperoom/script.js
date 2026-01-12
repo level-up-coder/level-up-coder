@@ -52,6 +52,10 @@
                 document.getElementById("progressBar").style.width="0%";
                 document.getElementById('timerDisplay').innerText = "DETONATED";
                 await rxChar.writeValue(new TextEncoder().encode("BOOM\n"));
+                
+                const sfx = document.getElementById('explosionSound');
+                sfx.play().catch(e => console.log("Audio play failed: ", e));
+            
             } else {
                 let percentage=(secondsLeft/360)*100;
                 document.getElementById('progressBar').style.width = percentage + "%";
