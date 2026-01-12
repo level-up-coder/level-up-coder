@@ -4,16 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tactical Link | SILENT MODE</title>
-    <style>
-        :root { --neon-green: #00ff41; --bg-dark: #0d0d0d; --panel-bg: #1a1a1a; --danger: #ff3e3e; }
-        body { font-family: 'Courier New', Courier, monospace; background-color: var(--bg-dark); color: var(--neon-green); display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        .container { width: 90%; max-width: 600px; background: var(--panel-bg); padding: 30px; border-radius: 10px; border: 1px solid #333; margin-top: 50px; }
-        h1 { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        #timerDisplay { font-size: 4rem; color: var(--danger); text-align: center; margin: 30px 0; display: none; font-weight: bold; }
-        button { background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 12px 24px; font-family: inherit; cursor: pointer; margin: 5px; text-transform: uppercase; }
-        button:hover { background: var(--neon-green); color: black; }
-        #console { background: #000; height: 150px; overflow-y: auto; border: 1px solid #333; padding: 15px; margin-top: 20px; font-size: 0.8rem; color: #fff; }
-    </style>
+    
 </head>
 <body>
 
@@ -27,66 +18,9 @@
     <button id="startTimerBtn" style="display:none; border-color:var(--danger); color:var(--danger)">ARM PAYLOAD</button>
     <button id="defuseBtn" style="display:none;">DEFUSE</button>
 
-    <div id="console">> Waiting for hardware...</div>
+    <div id="console"> Waiting for hardware...</div>
 </div>
 
-<script>
-    const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-    const RX_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
-    let rxChar, timerInterval, timeLeft = 20;
 
-    function log(msg, color = '#888') {
-        const entry = document.createElement('div');
-        entry.innerHTML = `<span style="color: ${color}">> ${msg}</span>`;
-        const c = document.getElementById('console');
-        c.appendChild(entry);
-        c.scrollTop = c.scrollHeight;
-    }
-
-    document.getElementById('connectBtn').onclick = async () => {
-        try {
-            const device = await navigator.bluetooth.requestDevice({
-                filters: [{ namePrefix: 'BBC micro:bit' }],
-                optionalServices: [SERVICE_UUID]
-            });
-            const server = await device.gatt.connect();
-            const service = await server.getPrimaryService(SERVICE_UUID);
-            rxChar = await service.getCharacteristic(RX_CHARACTERISTIC);
-            
-            document.getElementById('status-text').innerText = "ONLINE";
-            document.getElementById('status-text').style.color = "var(--neon-green)";
-            document.getElementById('startTimerBtn').style.display = "inline-block";
-            log("CONNECTION ESTABLISHED", "var(--neon-green)");
-        } catch (e) { log("ERR: " + e.message, "var(--danger)"); }
-    };
-
-    document.getElementById('startTimerBtn').onclick = () => {
-        document.getElementById('timerDisplay').style.display = "block";
-        document.getElementById('defuseBtn').style.display = "inline-block";
-        document.getElementById('startTimerBtn').style.display = "none";
-        log("TIMER_START: 20s", "var(--danger)");
-        
-        timerInterval = setInterval(async () => {
-            timeLeft--;
-            document.getElementById('timerDisplay').innerText = timeLeft + "s";
-            
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                const encoder = new TextEncoder();
-                // Send BOOM command
-                await rxChar.writeValue(encoder.encode("BOOM\n"));
-                log("SIGNAL_SENT: BOOM", "var(--danger)");
-                document.getElementById('timerDisplay').innerText = "DETONATED";
-            }
-        }, 1000);
-    };
-
-    document.getElementById('defuseBtn').onclick = () => {
-        clearInterval(timerInterval);
-        document.getElementById('timerDisplay').innerText = "SAFE";
-        log("DEFUSE_SUCCESSFUL", "var(--neon-green)");
-        document.getElementById('defuseBtn').style.display = "none";
-    };
-</script>
 </body>
 </html>
