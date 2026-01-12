@@ -5,32 +5,55 @@
     <title>Tactical Link v5.0</title>
     <style>
         body { background: #0d0d0d; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        
         .container { border: 1px solid #333; padding: 20px; background: #1a1a1a; width: 90%; max-width: 500px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,255,65,0.1); }
+        
         #timerDisplay { font-size: 3rem; color: #ff3e3e; text-align: center; margin: 20px 0; display: none; border: 1px dashed #ff3e3e; padding: 10px; }
+        
         button { background: transparent; color: #00ff41; border: 1px solid #00ff41; padding: 10px 20px; cursor: pointer; text-transform: uppercase; font-weight: bold; margin: 5px; }
+        
         button:hover { background: #00ff41; color: #000; }
+        
         #console { background: #000; height: 150px; overflow-y: auto; border: 1px solid #333; padding: 10px; margin-top: 20px; font-size: 0.8rem; }
+        
+        #defuseBtn{
+            display:none;
+        }
+        
+        #startTimerBtn{
+            display:none; border-color:#ff3e3e; color:#ff3e3e
+        }
+        h2{
+            letter-spacing: 2px;
+        }
+        span{
+            color:#ff3e3e
+        }
     </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 <body>
 
 <div class="container">
-    <h2 style="letter-spacing: 2px;">TACTICAL UPLINK</h2>
-    <p>STATUS: <span id="status-text" style="color:#ff3e3e">OFFLINE</span></p>
+    <h2>TACTICAL UPLINK</h2>
+    <p>STATUS: <span id="status-text">OFFLINE</span></p>
     
     <div id="timerDisplay">20s</div>
 
     <button id="connectBtn">INITIATE UPLINK</button>
-    <button id="startTimerBtn" style="display:none; border-color:#ff3e3e; color:#ff3e3e">ARM PAYLOAD</button>
-    <button id="defuseBtn" style="display:none;">DEFUSE</button>
+    <button id="startTimerBtn">ARM PAYLOAD</button>
+    <button id="defuseBtn">DEFUSE</button>
 
     <div id="console">> SYSTEM READY. WAITING FOR HANDSHAKE...</div>
 </div>
 
 <script>
+
     const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
     const RX_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
-    let rxChar, timerInterval, timeLeft = 20;
+    let rxChar, timerInterval;
+    let endTime; // Stores the target end time
 
     function log(msg, color = '#888') {
         const entry = document.createElement('div');
@@ -40,7 +63,6 @@
         c.scrollTop = c.scrollHeight;
     }
 
-    // Now 'connectBtn' is guaranteed to exist when this runs
     document.getElementById('connectBtn').onclick = async () => {
         try {
             log("SCANNING...");
@@ -60,32 +82,51 @@
     };
 
     document.getElementById('startTimerBtn').onclick = () => {
-        document.getElementById('timerDisplay').style.display = "block";
+        const display = document.getElementById('timerDisplay');
+        display.style.display = "block";
         document.getElementById('defuseBtn').style.display = "inline-block";
         document.getElementById('startTimerBtn').style.display = "none";
+        
+        // Set the end time to 20 seconds from now
+        endTime = Date.now() + 20000; 
         log("TIMER_START: 20s", "#ff3e3e");
         
+        // Run the timer every 10 milliseconds for high precision
         timerInterval = setInterval(async () => {
-            timeLeft--;
-            document.getElementById('timerDisplay').innerText = timeLeft + "s";
-            
-            if (timeLeft <= 0) {
+            let now = Date.now();
+            let distance = endTime - now;
+            let secondsLeft = Math.max(0, distance / 1000);
+
+            if (secondsLeft > 5) {
+                // Regular countdown: show whole seconds
+                display.innerText = Math.ceil(secondsLeft) + "s";
+            } else if (secondsLeft > 0) {
+                // Critical countdown: show milliseconds (2 decimal places)
+                display.innerText = secondsLeft.toFixed(2) + "s";
+                display.style.color = (Math.floor(now / 100) % 2) ? "#ff3e3e" : "#fff"; // Flashing effect
+            } else {
+                // Time's up!
                 clearInterval(timerInterval);
+                display.innerText = "0.00s";
+                display.style.color = "#ff3e3e";
+                
                 const encoder = new TextEncoder();
-                await rxChar.writeValue(encoder.encode("BOOM\n"));
+                await rxChar.writeValue(encoder.encode("BOOM\n")); //
                 log("SIGNAL_SENT: BOOM", "#ff3e3e");
                 document.getElementById('timerDisplay').innerText = "DETONATED";
                 document.getElementById('defuseBtn').style.display = "none";
             }
-        }, 1000);
+        }, 10);
     };
 
     document.getElementById('defuseBtn').onclick = () => {
         clearInterval(timerInterval);
         document.getElementById('timerDisplay').innerText = "SAFE";
+        document.getElementById('timerDisplay').style.color = "#00ff41";
         log("DEFUSE_SUCCESSFUL", "#00ff41");
         document.getElementById('defuseBtn').style.display = "none";
     };
+
 </script>
 </body>
 </html>
