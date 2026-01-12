@@ -2,27 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tactical Link | SILENT MODE</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
-    
+    <title>Tactical Link v5.0</title>
+    <style>
+        body { background: #0d0d0d; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .container { border: 1px solid #333; padding: 20px; background: #1a1a1a; width: 90%; max-width: 500px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,255,65,0.1); }
+        #timerDisplay { font-size: 3rem; color: #ff3e3e; text-align: center; margin: 20px 0; display: none; border: 1px dashed #ff3e3e; padding: 10px; }
+        button { background: transparent; color: #00ff41; border: 1px solid #00ff41; padding: 10px 20px; cursor: pointer; text-transform: uppercase; font-weight: bold; margin: 5px; }
+        button:hover { background: #00ff41; color: #000; }
+        #console { background: #000; height: 150px; overflow-y: auto; border: 1px solid #333; padding: 10px; margin-top: 20px; font-size: 0.8rem; }
+    </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Tactical Payload Link</h1>
-    <p>STATUS: <span id="status-text" style="color:var(--danger)">OFFLINE</span></p>
+    <h2 style="letter-spacing: 2px;">TACTICAL UPLINK</h2>
+    <p>STATUS: <span id="status-text" style="color:#ff3e3e">OFFLINE</span></p>
     
     <div id="timerDisplay">20s</div>
 
     <button id="connectBtn">INITIATE UPLINK</button>
-    <button id="startTimerBtn" style="display:none; border-color:var(--danger); color:var(--danger)">ARM PAYLOAD</button>
+    <button id="startTimerBtn" style="display:none; border-color:#ff3e3e; color:#ff3e3e">ARM PAYLOAD</button>
     <button id="defuseBtn" style="display:none;">DEFUSE</button>
 
-    <div id="console"> Waiting for hardware...</div>
+    <div id="console">> SYSTEM READY. WAITING FOR HANDSHAKE...</div>
 </div>
 
+<script>
+    const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+    const RX_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+    let rxChar, timerInterval, timeLeft = 20;
 
+    function log(msg, color = '#888') {
+        const entry = document.createElement('div');
+        entry.innerHTML = `<span style="color: ${color}">> ${msg}</span>`;
+        const c = document.getElementById('console');
+        c.appendChild(entry);
+        c.scrollTop = c.scrollHeight;
+    }
+
+    // Now 'connectBtn' is guaranteed to exist when this runs
+    document.getElementById('connectBtn').onclick = async () => {
+        try {
+            log("SCANNING...");
+            const device = await navigator.bluetooth.requestDevice({
+                filters: [{ namePrefix: 'BBC micro:bit' }],
+                optionalServices: [SERVICE_UUID]
+            });
+            const server = await device.gatt.connect();
+            const service = await server.getPrimaryService(SERVICE_UUID);
+            rxChar = await service.getCharacteristic(RX_CHARACTERISTIC);
+            
+            document.getElementById('status-text').innerText = "ONLINE";
+            document.getElementById('status-text').style.color = "#00ff41";
+            document.getElementById('startTimerBtn').style.display = "inline-block";
+            log("UPLINK ESTABLISHED", "#00ff41");
+        } catch (e) { log("ERR: " + e.message, "#ff3e3e"); }
+    };
+
+    document.getElementById('startTimerBtn').onclick = () => {
+        document.getElementById('timerDisplay').style.display = "block";
+        document.getElementById('defuseBtn').style.display = "inline-block";
+        document.getElementById('startTimerBtn').style.display = "none";
+        log("TIMER_START: 20s", "#ff3e3e");
+        
+        timerInterval = setInterval(async () => {
+            timeLeft--;
+            document.getElementById('timerDisplay').innerText = timeLeft + "s";
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                const encoder = new TextEncoder();
+                await rxChar.writeValue(encoder.encode("BOOM\n"));
+                log("SIGNAL_SENT: BOOM", "#ff3e3e");
+                document.getElementById('timerDisplay').innerText = "DETONATED";
+                document.getElementById('defuseBtn').style.display = "none";
+            }
+        }, 1000);
+    };
+
+    document.getElementById('defuseBtn').onclick = () => {
+        clearInterval(timerInterval);
+        document.getElementById('timerDisplay').innerText = "SAFE";
+        log("DEFUSE_SUCCESSFUL", "#00ff41");
+        document.getElementById('defuseBtn').style.display = "none";
+    };
+</script>
 </body>
 </html>
