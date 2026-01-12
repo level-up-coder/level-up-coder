@@ -53,7 +53,7 @@
                 document.getElementById('timerDisplay').innerText = "DETONATED";
                 await rxChar.writeValue(new TextEncoder().encode("BOOM\n"));
                 
-                const sfx = document.getElementById('explosionSound');
+                const sfx = document.getElementById('explosion');
                 sfx.play().catch(e => console.log("Audio play failed: ", e));
             
             } else {
