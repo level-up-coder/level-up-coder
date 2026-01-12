@@ -75,7 +75,7 @@
     };
 
     document.getElementById('startTimerBtn').onclick = () => {
-        endTime = Date.now() + 20000;
+        endTime = Date.now() + 36000;
         document.getElementById('timerDisplay').style.display = "block";
         document.getElementById('startTimerBtn').style.display = "none";
         log("PAYLOAD_ARMED", "#ff3e3e");
@@ -87,7 +87,7 @@
                 document.getElementById('timerDisplay').innerText = "DETONATED";
                 await rxChar.writeValue(new TextEncoder().encode("BOOM\n"));
             } else {
-                document.getElementById('timerDisplay').innerText = secondsLeft.toFixed(secondsLeft < 5 ? 2 : 0) + "s";
+                document.getElementById('timerDisplay').innerText = secondsLeft.toFixed(secondsLeft < 20 ? 2 : 0) + "s";
             }
         }, 10);
     };
