@@ -40,7 +40,7 @@
     };
 
     document.getElementById('startTimerBtn').onclick = () => {
-        endTime = Date.now() + 360000;
+        endTime = Date.now() + 20000;
         document.getElementById('timerDisplay').style.display = "block";
         document.getElementById('startTimerBtn').style.display = "none";
         log("PAYLOAD_ARMED", "#ff3e3e");
@@ -57,12 +57,12 @@
                 sfx.play().catch(e => console.log("Audio play failed: ", e));
             
             } else {
-                let percentage=(secondsLeft/360)*100;
+                let percentage=(secondsLeft/20)*100;
                 document.getElementById('progressBar').style.width = percentage + "%";
                 if (secondsLeft<5){
                     document.getElementById('progressBar').style.background = (Math.floor(Date.now()/100)%2) ? "#fff" : "#ff3e3e";
                 }
-                document.getElementById('timerDisplay').innerText = secondsLeft.toFixed(secondsLeft < 20 ? 2 : 0) + "s";
+                document.getElementById('timerDisplay').innerText = secondsLeft.toFixed(secondsLeft < 10 ? 2 : 0) + "s";
             }
         }, 10);
     };
