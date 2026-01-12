@@ -97,7 +97,7 @@
             let distance = endTime - now;
             let secondsLeft = Math.max(0, distance / 1000);
 
-            if (secondsLeft > 5) {
+            if (secondsLeft > 10) {
                 // Regular countdown: show whole seconds
                 display.innerText = Math.ceil(secondsLeft) + "s";
             } else if (secondsLeft > 0) {
