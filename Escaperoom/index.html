@@ -3,28 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Tactical Link | SECURITY LEVEL 4</title>
-    <style>
-        body { background: #0d0d0d; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .container { border: 1px solid #333; padding: 25px; background: #1a1a1a; width: 450px; border-radius: 12px; text-align: center; }
-        #timerDisplay { font-size: 3.5rem; color: #ff3e3e; margin: 20px 0; display: none; }
-        .passcode-area { margin: 20px 0; display: none; border-top: 1px solid #333; padding-top: 20px; }
-        input { background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 10px; width: 80px; text-align: center; font-size: 1.2rem; margin-right: 10px; }
-        button { background: transparent; color: #00ff41; border: 1px solid #00ff41; padding: 10px 15px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
-        button:hover { background: #00ff41; color: #000; }
-        #console { background: #000; height: 120px; overflow-y: auto; border: 1px solid #333; padding: 10px; margin-top: 20px; font-size: 0.8rem; text-align: left; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
     <h2>TACTICAL UPLINK</h2>
+    <div class="progressdiv">
+        <div id="progressBar"></div>
+    </div>
+    
     <div id="timerDisplay">20s</div>
 
     <button id="connectBtn">INITIATE UPLINK</button>
-    <button id="startTimerBtn" style="display:none; color:#ff3e3e; border-color:#ff3e3e">ARM PAYLOAD</button>
+    <button id="startTimerBtn">ARM PAYLOAD</button>
 
     <div id="defuseArea" class="passcode-area">
-        <p style="color:orange">> MOTION DETECTED: INPUT DEFUSE CODE</p>
+        <p>> MOTION DETECTED: INPUT DEFUSE CODE</p>
         <input type="text" id="passcodeInput" maxlength="4" placeholder="****">
         <button id="defuseBtn">SUBMIT</button>
     </div>
@@ -32,91 +27,7 @@
     <div id="console">> READY...</div>
 </div>
 
-<script>
-    const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-    const RX_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
-    const TX_CHARACTERISTIC = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
-    const CORRECT_CODE = "1337"; 
-    
-    let rxChar, timerInterval, endTime;
 
-    function log(msg, color = '#888') {
-        const entry = document.createElement('div');
-        entry.innerHTML = `<span style="color: ${color}">> ${msg}</span>`;
-        document.getElementById('console').appendChild(entry);
-        document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
-    }
-
-    document.getElementById('connectBtn').onclick = async () => {
-        try {
-            const device = await navigator.bluetooth.requestDevice({
-                filters: [{ namePrefix: 'BBC micro:bit' }],
-                optionalServices: [SERVICE_UUID]
-            });
-            const server = await device.gatt.connect();
-            const service = await server.getPrimaryService(SERVICE_UUID);
-            rxChar = await service.getCharacteristic(RX_CHARACTERISTIC);
-            
-            // Listen for the "TILT" signal from the microbit
-            const txChar = await service.getCharacteristic(TX_CHARACTERISTIC);
-            await txChar.startNotifications();
-            txChar.addEventListener('characteristicvaluechanged', (event) => {
-                const value = new TextDecoder().decode(event.target.value);
-                if (value.includes("TILT")) {
-                    document.getElementById('defuseArea').style.display = "block";
-                    log("REMOTE_EVENT: MOTION DETECTED", "orange");
-                }
-            });
-
-            document.getElementById('connectBtn').style.display = "none";
-            document.getElementById('startTimerBtn').style.display = "inline-block";
-            log("UPLINK_STABLE", "#00ff41");
-        } catch (e) { log("ERR: " + e.message, "#ff3e3e"); }
-    };
-
-    document.getElementById('startTimerBtn').onclick = () => {
-        endTime = Date.now() + 360000;
-        document.getElementById('timerDisplay').style.display = "block";
-        document.getElementById('startTimerBtn').style.display = "none";
-        log("PAYLOAD_ARMED", "#ff3e3e");
-        
-        timerInterval = setInterval(async () => {
-            let secondsLeft = (endTime - Date.now()) / 1000;
-            if (secondsLeft <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById('timerDisplay').innerText = "DETONATED";
-                await rxChar.writeValue(new TextEncoder().encode("BOOM\n"));
-            } else {
-                document.getElementById('timerDisplay').innerText = secondsLeft.toFixed(secondsLeft < 20 ? 2 : 0) + "s";
-            }
-        }, 10);
-    };
-
-    document.getElementById('defuseBtn').onclick = () => {
-        const input = document.getElementById('passcodeInput').value;
-        if (input === CORRECT_CODE) {
-            clearInterval(timerInterval);
-            document.getElementById('timerDisplay').innerText = "SAFE";
-            document.getElementById('timerDisplay').style.color = "#00ff41";
-            document.getElementById('defuseArea').style.display = "none";
-            log("ACCESS_GRANTED: SYSTEM_DISARMED", "#00ff41");
-        } else {
-            // PENALTY SYSTEM: Subtract 5 seconds (5000ms) from the remaining time
-            endTime -= 5000; 
-            
-            document.getElementById('passcodeInput').value = "";
-            document.getElementById('timerDisplay').style.color = "white"; // Quick flash to show hit
-            
-            log("ACCESS_DENIED: PENALTY -5s APPLIED", "#ff3e3e");
-            
-            // Visual feedback for the penalty
-            setTimeout(() => {
-                if (endTime - Date.now() > 0) {
-                    document.getElementById('timerDisplay').style.color = "#ff3e3e";
-                }
-            }, 200);
-        }
-    };
-</script>
+<script src="script.js"></script>
 </body>
 </html>
