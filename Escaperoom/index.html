@@ -75,7 +75,7 @@
     };
 
     document.getElementById('startTimerBtn').onclick = () => {
-        endTime = Date.now() + 36000;
+        endTime = Date.now() + 360000;
         document.getElementById('timerDisplay').style.display = "block";
         document.getElementById('startTimerBtn').style.display = "none";
         log("PAYLOAD_ARMED", "#ff3e3e");
@@ -97,11 +97,24 @@
         if (input === CORRECT_CODE) {
             clearInterval(timerInterval);
             document.getElementById('timerDisplay').innerText = "SAFE";
+            document.getElementById('timerDisplay').style.color = "#00ff41";
             document.getElementById('defuseArea').style.display = "none";
             log("ACCESS_GRANTED: SYSTEM_DISARMED", "#00ff41");
         } else {
+            // PENALTY SYSTEM: Subtract 5 seconds (5000ms) from the remaining time
+            endTime -= 5000; 
+            
             document.getElementById('passcodeInput').value = "";
-            log("ACCESS_DENIED: INCORRECT CODE", "#ff3e3e");
+            document.getElementById('timerDisplay').style.color = "white"; // Quick flash to show hit
+            
+            log("ACCESS_DENIED: PENALTY -5s APPLIED", "#ff3e3e");
+            
+            // Visual feedback for the penalty
+            setTimeout(() => {
+                if (endTime - Date.now() > 0) {
+                    document.getElementById('timerDisplay').style.color = "#ff3e3e";
+                }
+            }, 200);
         }
     };
 </script>
