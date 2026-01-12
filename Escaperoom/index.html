@@ -2,70 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tactical Link v5.0</title>
+    <title>Tactical Link | SECURITY LEVEL 4</title>
     <style>
         body { background: #0d0d0d; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        
-        .container { border: 1px solid #333; padding: 20px; background: #1a1a1a; width: 90%; max-width: 500px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,255,65,0.1); }
-        
-        #timerDisplay { font-size: 3rem; color: #ff3e3e; text-align: center; margin: 20px 0; display: none; border: 1px dashed #ff3e3e; padding: 10px; }
-        
-        button { background: transparent; color: #00ff41; border: 1px solid #00ff41; padding: 10px 20px; cursor: pointer; text-transform: uppercase; font-weight: bold; margin: 5px; }
-        
+        .container { border: 1px solid #333; padding: 25px; background: #1a1a1a; width: 450px; border-radius: 12px; text-align: center; }
+        #timerDisplay { font-size: 3.5rem; color: #ff3e3e; margin: 20px 0; display: none; }
+        .passcode-area { margin: 20px 0; display: none; border-top: 1px solid #333; padding-top: 20px; }
+        input { background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 10px; width: 80px; text-align: center; font-size: 1.2rem; margin-right: 10px; }
+        button { background: transparent; color: #00ff41; border: 1px solid #00ff41; padding: 10px 15px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
         button:hover { background: #00ff41; color: #000; }
-        
-        #console { background: #000; height: 150px; overflow-y: auto; border: 1px solid #333; padding: 10px; margin-top: 20px; font-size: 0.8rem; }
-        
-        #defuseBtn{
-            display:none;
-        }
-        
-        #startTimerBtn{
-            display:none; border-color:#ff3e3e; color:#ff3e3e
-        }
-        h2{
-            letter-spacing: 2px;
-        }
-        span{
-            color:#ff3e3e
-        }
+        #console { background: #000; height: 120px; overflow-y: auto; border: 1px solid #333; padding: 10px; margin-top: 20px; font-size: 0.8rem; text-align: left; }
     </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 </head>
 <body>
 
 <div class="container">
     <h2>TACTICAL UPLINK</h2>
-    <p>STATUS: <span id="status-text">OFFLINE</span></p>
-    
     <div id="timerDisplay">20s</div>
 
     <button id="connectBtn">INITIATE UPLINK</button>
-    <button id="startTimerBtn">ARM PAYLOAD</button>
-    <button id="defuseBtn">DEFUSE</button>
+    <button id="startTimerBtn" style="display:none; color:#ff3e3e; border-color:#ff3e3e">ARM PAYLOAD</button>
 
-    <div id="console">> SYSTEM READY. WAITING FOR HANDSHAKE...</div>
+    <div id="defuseArea" class="passcode-area">
+        <p style="color:orange">> MOTION DETECTED: INPUT DEFUSE CODE</p>
+        <input type="text" id="passcodeInput" maxlength="4" placeholder="****">
+        <button id="defuseBtn">SUBMIT</button>
+    </div>
+
+    <div id="console">> READY...</div>
 </div>
 
 <script>
-
     const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
     const RX_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
-    let rxChar, timerInterval;
-    let endTime; // Stores the target end time
+    const TX_CHARACTERISTIC = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+    const CORRECT_CODE = "1337"; 
+    
+    let rxChar, timerInterval, endTime;
 
     function log(msg, color = '#888') {
         const entry = document.createElement('div');
         entry.innerHTML = `<span style="color: ${color}">> ${msg}</span>`;
-        const c = document.getElementById('console');
-        c.appendChild(entry);
-        c.scrollTop = c.scrollHeight;
+        document.getElementById('console').appendChild(entry);
+        document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
     }
 
     document.getElementById('connectBtn').onclick = async () => {
         try {
-            log("SCANNING...");
             const device = await navigator.bluetooth.requestDevice({
                 filters: [{ namePrefix: 'BBC micro:bit' }],
                 optionalServices: [SERVICE_UUID]
@@ -74,58 +57,53 @@
             const service = await server.getPrimaryService(SERVICE_UUID);
             rxChar = await service.getCharacteristic(RX_CHARACTERISTIC);
             
-            document.getElementById('status-text').innerText = "ONLINE";
-            document.getElementById('status-text').style.color = "#00ff41";
+            // Listen for the "TILT" signal from the microbit
+            const txChar = await service.getCharacteristic(TX_CHARACTERISTIC);
+            await txChar.startNotifications();
+            txChar.addEventListener('characteristicvaluechanged', (event) => {
+                const value = new TextDecoder().decode(event.target.value);
+                if (value.includes("TILT")) {
+                    document.getElementById('defuseArea').style.display = "block";
+                    log("REMOTE_EVENT: MOTION DETECTED", "orange");
+                }
+            });
+
+            document.getElementById('connectBtn').style.display = "none";
             document.getElementById('startTimerBtn').style.display = "inline-block";
-            log("UPLINK ESTABLISHED", "#00ff41");
+            log("UPLINK_STABLE", "#00ff41");
         } catch (e) { log("ERR: " + e.message, "#ff3e3e"); }
     };
 
     document.getElementById('startTimerBtn').onclick = () => {
-        const display = document.getElementById('timerDisplay');
-        display.style.display = "block";
-        document.getElementById('defuseBtn').style.display = "inline-block";
+        endTime = Date.now() + 20000;
+        document.getElementById('timerDisplay').style.display = "block";
         document.getElementById('startTimerBtn').style.display = "none";
+        log("PAYLOAD_ARMED", "#ff3e3e");
         
-        // Set the end time to 20 seconds from now
-        endTime = Date.now() + 20000; 
-        log("TIMER_START: 20s", "#ff3e3e");
-        
-        // Run the timer every 10 milliseconds for high precision
         timerInterval = setInterval(async () => {
-            let now = Date.now();
-            let distance = endTime - now;
-            let secondsLeft = Math.max(0, distance / 1000);
-
-            if (secondsLeft > 10) {
-                // Regular countdown: show whole seconds
-                display.innerText = Math.ceil(secondsLeft) + "s";
-            } else if (secondsLeft > 0) {
-                // Critical countdown: show milliseconds (2 decimal places)
-                display.innerText = secondsLeft.toFixed(2) + "s";
-            } else {
-                // Time's up!
+            let secondsLeft = (endTime - Date.now()) / 1000;
+            if (secondsLeft <= 0) {
                 clearInterval(timerInterval);
-                display.innerText = "0.00s";
-                display.style.color = "#ff3e3e";
-                
-                const encoder = new TextEncoder();
-                await rxChar.writeValue(encoder.encode("BOOM\n")); //
-                log("SIGNAL_SENT: BOOM", "#ff3e3e");
                 document.getElementById('timerDisplay').innerText = "DETONATED";
-                document.getElementById('defuseBtn').style.display = "none";
+                await rxChar.writeValue(new TextEncoder().encode("BOOM\n"));
+            } else {
+                document.getElementById('timerDisplay').innerText = secondsLeft.toFixed(secondsLeft < 5 ? 2 : 0) + "s";
             }
         }, 10);
     };
 
     document.getElementById('defuseBtn').onclick = () => {
-        clearInterval(timerInterval);
-        document.getElementById('timerDisplay').innerText = "SAFE";
-        document.getElementById('timerDisplay').style.color = "#00ff41";
-        log("DEFUSE_SUCCESSFUL", "#00ff41");
-        document.getElementById('defuseBtn').style.display = "none";
+        const input = document.getElementById('passcodeInput').value;
+        if (input === CORRECT_CODE) {
+            clearInterval(timerInterval);
+            document.getElementById('timerDisplay').innerText = "SAFE";
+            document.getElementById('defuseArea').style.display = "none";
+            log("ACCESS_GRANTED: SYSTEM_DISARMED", "#00ff41");
+        } else {
+            document.getElementById('passcodeInput').value = "";
+            log("ACCESS_DENIED: INCORRECT CODE", "#ff3e3e");
+        }
     };
-
 </script>
 </body>
 </html>
