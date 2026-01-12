@@ -103,7 +103,6 @@
             } else if (secondsLeft > 0) {
                 // Critical countdown: show milliseconds (2 decimal places)
                 display.innerText = secondsLeft.toFixed(2) + "s";
-                display.style.color = (Math.floor(now / 100) % 2) ? "#ff3e3e" : "#fff"; // Flashing effect
             } else {
                 // Time's up!
                 clearInterval(timerInterval);
