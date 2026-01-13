@@ -27,6 +27,7 @@
             await txChar.startNotifications();
             txChar.addEventListener('characteristicvaluechanged', (event) => {
                 const value = new TextDecoder().decode(event.target.value);
+                let secondsLeft = (endTime - Date.now()) / 1000;
                 if (value.includes("TILT")) {
                     document.getElementById('defuseArea').style.display = "block";
                     log("REMOTE_EVENT: MOTION DETECTED", "orange");
@@ -68,6 +69,16 @@
     };
 
     document.getElementById('defuseBtn').onclick = () => {
+        // 1. CHECK IF THE BOMB HAS ALREADY EXPLODED
+        let secondsLeft = (endTime - Date.now()) / 1000;
+    
+        if (secondsLeft <= 0) {
+            log("ERROR: CANNOT DISARM. PAYLOAD HAS DETONATED.", "#ff3e3e");
+            document.getElementById('defuseArea').style.display = "none";
+            return; // This stops the rest of the code from running!
+        }
+
+        // 2. IF NOT EXPLODED, CHECK THE CODE
         const input = document.getElementById('passcodeInput').value;
         if (input === CORRECT_CODE) {
             clearInterval(timerInterval);
@@ -76,19 +87,8 @@
             document.getElementById('defuseArea').style.display = "none";
             log("ACCESS_GRANTED: SYSTEM_DISARMED", "#00ff41");
         } else {
-            // PENALTY SYSTEM: Subtract 5 seconds (5000ms) from the remaining time
-            endTime -= 5000; 
-            
+            endTime -= 5000; // Penalty
             document.getElementById('passcodeInput').value = "";
-            document.getElementById('timerDisplay').style.color = "white"; // Quick flash to show hit
-            
-            log("ACCESS_DENIED: PENALTY -5s APPLIED", "#ff3e3e");
-            
-            // Visual feedback for the penalty
-            setTimeout(() => {
-                if (endTime - Date.now() > 0) {
-                    document.getElementById('timerDisplay').style.color = "#ff3e3e";
-                }
-            }, 200);
+            log("ACCESS_DENIED: PENALTY -5s", "#ff3e3e");
         }
     };
