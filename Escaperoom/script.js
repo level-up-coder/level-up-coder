@@ -40,33 +40,47 @@
         } catch (e) { log("ERR: " + e.message, "#ff3e3e"); }
     };
 
-    document.getElementById('startTimerBtn').onclick = () => {
-        endTime = Date.now() + 3600000;
-        document.getElementById('timerDisplay').style.display = "block";
-        document.getElementById('startTimerBtn').style.display = "none";
-        log("PAYLOAD_ARMED", "#ff3e3e");
+document.getElementById('startTimerBtn').onclick = () => {
+    // 1. SET THE TOTAL TIME HERE (3600 = 1 Hour)
+    const totalSeconds = 3600; 
+    
+    // 2. CALCULATE END TIME
+    endTime = Date.now() + (totalSeconds * 1000);
+    
+    document.getElementById('timerDisplay').style.display = "block";
+    document.getElementById('startTimerBtn').style.display = "none";
+    log("PAYLOAD_ARMED", "#ff3e3e");
+    
+    timerInterval = setInterval(async () => {
+        let secondsLeft = (endTime - Date.now()) / 1000;
         
-        timerInterval = setInterval(async () => {
-            let secondsLeft = (endTime - Date.now()) / 1000;
-            if (secondsLeft <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById("progressBar").style.width="0%";
-                document.getElementById('timerDisplay').innerText = "DETONATED";
-                await rxChar.writeValue(new TextEncoder().encode("BOOM\n"));
-                
-                const sfx = document.getElementById('explosion');
-                sfx.play().catch(e => console.log("Audio play failed: ", e));
+        if (secondsLeft <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById("progressBar").style.width = "0%";
+            document.getElementById('timerDisplay').innerText = "DETONATED";
             
-            } else {
-                let percentage=(secondsLeft/3600)*100;
-                document.getElementById('progressBar').style.width = percentage + "%";
-                if (secondsLeft<5){
-                    document.getElementById('progressBar').style.background = (Math.floor(Date.now()/100)%2) ? "#fff" : "#ff3e3e";
-                }
-                document.getElementById('timerDisplay').innerText = secondsLeft.toFixed(secondsLeft < 10 ? 2 : 0) + "s";
+            // Audio and Microbit signal
+            await rxChar.writeValue(new TextEncoder().encode("BOOM\n"));
+            const sfx = document.getElementById('explosion');
+            if(sfx) sfx.play();
+            
+        } else {
+            // 3. FIXED PROGRESS BAR MATH
+            // Dividing by totalSeconds ensures the bar starts at 100%
+            let percentage = (secondsLeft / totalSeconds) * 100;
+            document.getElementById('progressBar').style.width = percentage + "%";
+            
+            // 4. DISPLAY TEXT
+            // This will show big numbers (like 3599s)
+            document.getElementById('timerDisplay').innerText = secondsLeft.toFixed(secondsLeft < 10 ? 2 : 0) + "s";
+
+            // Visual Alarm for last 5 seconds
+            if (secondsLeft < 5) {
+                document.getElementById('progressBar').style.background = (Math.floor(Date.now()/100)%2) ? "#fff" : "#ff3e3e";
             }
-        }, 10);
-    };
+        }
+    }, 10);
+};
 
     document.getElementById('defuseBtn').onclick = () => {
         // 1. CHECK IF THE BOMB HAS ALREADY EXPLODED
