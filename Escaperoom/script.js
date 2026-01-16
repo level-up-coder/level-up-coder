@@ -1,7 +1,7 @@
     const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
     const RX_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
     const TX_CHARACTERISTIC = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
-    const CORRECT_CODE = "1337"; 
+    const CORRECT_CODE ="122011"; 
     
     let rxChar, timerInterval, endTime;
 
@@ -41,7 +41,7 @@
     };
 
     document.getElementById('startTimerBtn').onclick = () => {
-        endTime = Date.now() + 20000;
+        endTime = Date.now() + 3600000;
         document.getElementById('timerDisplay').style.display = "block";
         document.getElementById('startTimerBtn').style.display = "none";
         log("PAYLOAD_ARMED", "#ff3e3e");
@@ -58,7 +58,7 @@
                 sfx.play().catch(e => console.log("Audio play failed: ", e));
             
             } else {
-                let percentage=(secondsLeft/20)*100;
+                let percentage=(secondsLeft/3600)*100;
                 document.getElementById('progressBar').style.width = percentage + "%";
                 if (secondsLeft<5){
                     document.getElementById('progressBar').style.background = (Math.floor(Date.now()/100)%2) ? "#fff" : "#ff3e3e";
