@@ -9,7 +9,7 @@ body {
 
 .headimage {
     /* This makes the container fill the whole screen */
-    height: 100%;
+    height: 30%;
     width: 100%;
 
     /* This is the magic for perfect centering */
