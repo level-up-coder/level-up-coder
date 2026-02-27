@@ -1,5 +1,11 @@
+.body{
+    background-color: black;
+}
+
+
 .headimage{
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
+    text-align: center;
 }
