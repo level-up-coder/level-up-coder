@@ -1,9 +1,10 @@
 
 body {
-  background-image: url("img_tree.png");
+  background-image: url("headimage.png");
   background-repeat: no-repeat;
   background-position:top;
   margin-right: 200px;
   background-attachment: fixed;
+  background-color: black;
 
 }
