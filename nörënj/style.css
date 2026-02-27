@@ -1,11 +1,29 @@
-body{
+/* Target the tag directly (no dot) */
+body {
     background-color: black;
+    margin: 0;
+    padding: 0;
+    /* This ensures the body takes up the full screen height */
+    height: 100vh; 
 }
 
+.headimage {
+    /* This makes the container fill the whole screen */
+    height: 100%;
+    width: 100%;
 
-.headimage{
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: cover;
-    background-position: center;
+    /* This is the magic for perfect centering */
+    display: flex;
+    justify-content: center; /* Horizontal center */
+    align-items: center;     /* Vertical center */
+}
+
+.headimage img {
+    /* This ensures the image doesn't overflow small screens */
+    max-width: 90%;
+    max-height: 90vh;
+    height: auto;
+    
+    /* Your original alignment settings (if you still want them) */
+    display: block;
 }
