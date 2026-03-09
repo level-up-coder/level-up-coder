@@ -10,7 +10,8 @@ body {
 
 .header{
   font-family: 'DM Sans';
-
+  padding-top: 300;
   color: white;
   font-size: 3rem;
 }
+
