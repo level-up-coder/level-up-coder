@@ -1,10 +1,16 @@
 
-.header{
+body {
   background-image: url("images/headimage.png");
   background-repeat: no-repeat;
   background-position:top;
   margin-right: 200px;
   background-attachment: fixed;
   background-color: black;
-  font-family: 'DM Sans'
+}
+
+.header{
+  font-family: 'DM Sans';
+  padding: 300px;
+  color: white;
+  font-size: 3rem;
 }
