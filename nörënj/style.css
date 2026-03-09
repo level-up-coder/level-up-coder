@@ -1,10 +1,10 @@
 
-body {
+.header{
   background-image: url("images/headimage.png");
   background-repeat: no-repeat;
   background-position:top;
   margin-right: 200px;
   background-attachment: fixed;
   background-color: black;
-  font-family: 'DM Sans', 'Playfair Display';
+  font-family: 'DM Sans'
 }
